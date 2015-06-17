@@ -1,6 +1,6 @@
 import pandas as pd
 from data_collection import DataCollection
-import json
+import cPickle
 
 
 class Cleaning(object):
@@ -19,6 +19,16 @@ class Cleaning(object):
 		self.activity_dict={}
 		self.repayment_interval_dict = {}
 		self.status_dic={}
+
+		self.country_code_list = list(self.df.country_code.unique())
+		self.town_list= list(self.df.town.unique())
+		self.sector_list= list(self.df.sector.unique())
+		self.theme_list= list(self.df.theme.unique())
+		self.geo_level_list= list(self.df.geo_level.unique())
+		self.activity_list = list(self.df.activity.unique())
+		self.repayment_interval_list = list(self.df.repayment_interval.unique())
+		self.status_list=(self.df.status.unique())
+
 		
 		self.fill_dictionarys()
 		self.change_all_variable()
@@ -180,20 +190,23 @@ class Saving(object):
 	def __init__(self, number_file_read =2):
 		clean = Cleaning(number_file_read)
 		self.df = clean.df
-		self.country_code_dict = clean.country_code_dict
-		self.town_dict=clean.town_dict
-		self.sector_dict=clean.sector_dict
-		self.theme_dict=clean.theme_dict
-		self.geo_level_dict=clean.geo_level_dict
-		self.activity_dict=clean.activity_dict
-		self.repayment_interval_dict = clean.repayment_interval_dict
-		self.status_dic=clean.status_dic
+		self.country_code_list = clean.country_code_list
+		self.town_list=clean.town_list
+		self.sector_list=clean.sector_list
+		self.theme_list=clean.theme_list
+		self.geo_level_list=clean.geo_level_list
+		self.activity_list=clean.activity_list
+		self.repayment_interval_list = clean.repayment_interval_list
+		self.status_list=clean.status_list
 		self.number_of_files = number_file_read
 
 	def save_files(self):
-		self.df.to_csv("/home/patanjalichanakya/Documents/Galvanize/project/data/%s.csv" %self.number_of_files)
-		dict_ = {"country_code_dict":self.country_code_dict, "town_dict":self.town_dict, "sector_dict":self.sector_dict, "theme_dict": self.theme_dict, "geo_level_dict":self.geo_level_dict,\
-				 "activity_dict":self.activity_dict, "repayment_interval_dict": self.repayment_interval_dict, "status_dic":self.status_dic, "number_of_files":self.number_of_files}
+		condition_1 = self.df.status == 1
+		condition_2 = self.df.status ==0
+		self.df_new = self.df[condition_1 | condition_2]
+		self.df_new.to_csv("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/%s_two_option.csv" %self.number_of_files)
+		dict_ = {"country_code_list":self.country_code_list, "town_list":self.town_list, "sector_list":self.sector_list, "theme_list": self.theme_list, "geo_level_list":self.geo_level_list,\
+				 "activity_list":self.activity_list, "repayment_interval_list": self.repayment_interval_list, "status_list":self.status_list}
 		for file_name, content in dict_.iteritems():
-			with open("/home/patanjalichanakya/Documents/Galvanize/project/data/%s_%s.json" %(file_name, self.number_of_files), 'w') as f:
-				json.dump(content, f) 		
+			with open("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/%s_%s.pickle" %(file_name, self.number_of_files), 'w') as f:
+				cPickle.dump(content, f) 		

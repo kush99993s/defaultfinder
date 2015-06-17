@@ -15,7 +15,7 @@ class DataCollection(object):
 
     def read_file(self, number_of_files =2):
         for i in range(1, number_of_files):
-            with open("/home/patanjalichanakya/Documents/Galvanize/project/data/loans/%s.json" %i) as f:
+            with open("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/loans/%s.json" %i) as f:
                 file_ = f.read()
             file_json = json.loads(file_)["loans"]
             for j in range(len(file_json)):
