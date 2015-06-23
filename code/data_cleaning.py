@@ -1,6 +1,7 @@
 import pandas as pd
 from data_collection import DataCollection
 import cPickle
+import os.path
 
 
 class Cleaning(object):
@@ -210,3 +211,15 @@ class Saving(object):
 		for file_name, content in dict_.iteritems():
 			with open("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/%s_%s.pickle" %(file_name, self.number_of_files), 'w') as f:
 				cPickle.dump(content, f) 		
+
+class OpenFile(object):
+	def __init__(self):
+		self.isfile_ = os.path.isfile("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/1638.csv") 
+
+	def openfile(self):
+		if self.isfile_:
+			return pd.read_csv("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/1638.csv")
+		else:
+			saving = Saving(number_file_read = 1638)
+			saving.save_files()
+			return pd.read_csv("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/1638.csv")
