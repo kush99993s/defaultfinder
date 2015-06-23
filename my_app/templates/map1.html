@@ -291,113 +291,29 @@
                 <div class="col-lg-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Normalized Default Rate
+                            <i class="fa fa-bar-chart-o fa-fw"></i> ROC curve
                             <div class="pull-right">
                                 <div class="btn-group", id = "kush">
                                     <select id="cardtype" name="cards">
                                         <option value="selectcard">--- Please select ---</option>
-                                        <option value="group_by_country">Group by Country</option>
-                                        <option value="group_by_parter_id">Group by Parter ID</option>
-                                        <option value="group_by_town">Group by Town</option>
+                                        <option value="LogisticRegression">Logistic Regression</option>
+                                        <option value="AdaBoostRegressor">AdaBoost Regressor</option>
+                                        <option value="GradientBoostingClassifier">Gradient Boosting Classifier</option>
+                                        <option value="GradientBoostingRegressor">Gradient Boosting Regressor</option>
+                                        <option value="RandomForestRegressor">Random Forest Regressor</option>
+                                        <option value="RandomForestClassifier">Random Forest Classifier</option>
+                                        <option value="DecisionTreeRegressor">Decision Tree Regressor</option>
+                                        <option value="DecisionTreeClassifier">Decision Tree Classifier</option>
                                      </select><br/>
                                     <div id="result"></div>
                                 </div>
                             </div>
                         </div>
-                        <script type="text/javascript">
-                            $("select").change(function() {
-                                alert('success');
-                                var val = $("#cardtype option:checked").val();
-                                alert(val);
-                                if (val == 'group_by_country') {
-                                    try{
-                                       $('g').remove()
-                                    }
-                                    catch(err){}
-
-                                    window.countryGeoJSON = {{ map_geo_json | safe }}
-
-                                    
-                                    function getColor(d) {
-                                        return  d > 0.2     ? '#800026' :
-                                                d > 0.1     ? '#BD0026' :
-                                                d > 0.05    ? '#E31A1C' :
-                                                d > 0.01    ? '#FC4E2A' :
-                                                d > 0.005   ? '#FD8D3C' :
-                                                d > 0.002   ? '#FEB24C' :
-                                                d > 0       ? '#FED976' :
-                                                              '#FFFF' ;
-                                    }
-
-                                    function style(feature) {
-                                        return {
-                                            fillColor: getColor(feature.density),
-                                            weight: 2,
-                                            opacity: 1,
-                                            color: 'white',
-                                            dashArray: '3',
-                                            fillOpacity: 0.7
-                                        };
-                                    }
-                                   //  function highlightFeature(e) {
-                                   //          var layer = e.target;
-
-                                   //          layer.setStyle({
-                                   //              weight: 5,
-                                   //              color: '#666',
-                                   //              dashArray: '',
-                                   //              fillOpacity: 0.7
-                                   //          });
-
-                                   //          if (!L.Browser.ie && !L.Browser.opera) {
-                                   //              layer.bringToFront();
-                                   //          }
-                                   //  }
-                                   
-                                   // function zoomToFeature(e) {
-                                   //      map.fitBounds(e.target.getBounds());
-                                   //  } 
-
-                                   //  function resetHighlight(e) {
-                                   //      newLayer.resetStyle(e.target);
-                                   //  }
-                                    
-                                   //  function onEachFeature(feature, layer) {
-                                   //      layer.on({
-                                   //          mouseover: highlightFeature,
-                                   //          mouseout: resetHighlight,
-                                   //          click: zoomToFeature
-                                   //      });
-                                   //  }
-                                    
-                                    // {onEachFeature: onEachFeature} 
-                                    newLayer = L.geoJson(window.countryGeoJSON, {style: style}).addTo(map);
-                                    newLayer.on('click', onMapClick);
-                                
-                                }else if (val == 'group_by_parter_id'){
-                                    try{
-                                        map.removeLayer(newLayer);
-                                    }catch(err){}
-
-                                    {% for index in range(0, 376)%}
-                                        
-                                        {% if normalized_default[index] > 0%}
-                                            circle = L.circle([{{lat[index]}}, {{long_[index]}}], 3000000*{{normalized_default[index]}}, {
-                                                color: 'red',
-                                                fillColor: '#f03',
-                                                fillOpacity: 0.5
-                                            }).addTo(map);
-                                            circle.bindPopup('{{"parter id: ", parter_id[index], "default rate: ",normalized_default[index] }}');
-                                        {% endif %}
-                                    {% endfor %}
-                                }
-                            });
-
-                        </script>
+                        
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div id = "map" style="width: 1000px; height: 800px">
-                                    </div>
+                            <!-- <div id = "map" style="width: 1000px; height: 800px">
+                                    </div> -->
                             
                             <!-- <div id="morris-area-chart"></div> -->
                         </div>
@@ -475,34 +391,7 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="static/js/sb-admin-2.js"></script>
-    <script>
-        window.latlong =[]
-        map = L.map('map').setView([0, 0], 4); // 4 here is magnification level shown in first time
-
-        L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-            maxZoom: 22 , // how mnay time you can magnify from largest map. After 22 zoom, map is not working due to more magnificaiton
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-            id: 'examples.map-i875mjb7'
-        }).addTo(map);
-        
-        
-        
-        var popup = L.popup();
-
-        function onMapClick(e) {
-            popup.setLatLng(e.latlng)
-                 .setContent("You clicked the map at " + e.latlng.toString())
-                 .openOn(map);
-            window.latlong.push(e.latlng);}
-        map.on('click', onMapClick);
-
-
-       
-                              
     
-        </script>
                                     
 
 </body>
