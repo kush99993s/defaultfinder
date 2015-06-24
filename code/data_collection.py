@@ -6,6 +6,9 @@ import json
 # creating dictionary that will hold data 
 class DataCollection(object):
     def __init__(self):
+        """
+        Put Kiva dump into a dict. Info about loan (including partner_id, activity, sector, amount loaned, gender, etc) 
+        """
         self.dict_={"activity":[], "basket_amount":[], "bonus_credit_eligibility":[], "gender":[], \
         		"num_borrowers":[],"has_picture":[], "description_lang":[], "description": [],\
         		 "funded_amount": [], "funded_date": [], "bulkEntries":[], "entries": [], \
@@ -13,7 +16,12 @@ class DataCollection(object):
         		 "sector": [], "status": [], "tags":[], "len_teg":[], "video": [], "repayment_term":[],\
         		 "repayment_interval":[], "use":[], "theme":[], "lat":[], "long":[]}
 
-    def read_file(self, number_of_files =2):
+    def read_file(self, number_of_files=2):
+        """
+        Read the file containing the loan info and put it into a dict. Set the dict with the info as an instance variable.
+
+        number_of_files: The amount of data you wanna process. Each file has 500 loans
+        """
         for i in range(1, number_of_files):
             with open("/home/patanjalichanakya/Documents/Galvanize/find_defaulte/rdata/loans/%s.json" %i) as f:
                 file_ = f.read()

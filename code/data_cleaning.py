@@ -5,22 +5,27 @@ import os.path
 
 
 class Cleaning(object):
-	def __init__(self, number_file_read =2):
+	def __init__(self, number_file_read=2):
+		"""
+		Preprocess data for EDA and model building
+		"""
 		data  = DataCollection()
-		
 		dict_ = data.read_file(number_file_read)
 		
+		# Convert the data from a dict to pandas df
 		self.df = self.convert_to_data_frame(dict_)
 		
+		# Encoding string info to numeric for model building
 		self.country_code_dict = {}
-		self.town_dict={}
-		self.sector_dict={}
-		self.theme_dict={}
-		self.geo_level_dict={}
-		self.activity_dict={}
+		self.town_dict = {}
+		self.sector_dict = {}
+		self.theme_dict = {}
+		self.geo_level_dict = {}
+		self.activity_dict = {}
 		self.repayment_interval_dict = {}
-		self.status_dic={}
+		self.status_dic = {}
 
+		# Decoding numeric values to string values (i.e. country, activity, etc)
 		self.country_code_list = list(self.df.country_code.unique())
 		self.town_list= list(self.df.town.unique())
 		self.sector_list= list(self.df.sector.unique())
@@ -30,7 +35,7 @@ class Cleaning(object):
 		self.repayment_interval_list = list(self.df.repayment_interval.unique())
 		self.status_list=(self.df.status.unique())
 
-		
+		# This will fill the dictinary to encode string values		
 		self.fill_dictionarys()
 		self.change_all_variable()
 		
@@ -71,10 +76,6 @@ class Cleaning(object):
 		self.delete_columns()
 		self.change_text()
 		
-	
-	
-		
-
 	def replace_values(self):
 		self.df.country_code = self.df.country_code.apply(lambda x : self.change_country_code(x))
 		self.df.town = self.df.town.apply(lambda x : self.change_town(x))
@@ -100,10 +101,9 @@ class Cleaning(object):
 			return x.encode("ascii", "ignore").replace("<i>", " ").replace("</i>", " ").replace("<br>", " ").replace("</br>", " ")
 		except:
 			None
-
-			
+	
 	def change_text(self):
-		self.df.description = self.df.description.apply(lambda x: self.text_change(x) )
+		self.df['description'] = self.df['description'].apply(lambda x: self.text_change(x) )
 		
 	def find_male(self,x):
 	    temp_m = 0
@@ -122,9 +122,8 @@ class Cleaning(object):
 	def change_gender(self):
 		self.df["num_male"] = self.df.gender.apply(lambda x: self.find_male(x))
 		self.df["num_female"] = self.df.gender.apply(lambda x: self.find_female(x))
-		self.df["male_ratio"] = self.df.num_male/self.df.num_borrowers
+		self.df["male_ratio"] = self.df.num_male / self.df.num_borrowers
 		
-
 	def number_picture(self, x):
 		number_picture_ = 0
 		for j in range(len(x)):
@@ -174,7 +173,6 @@ class Cleaning(object):
 		else:
 			return -2
 
-
 	def change_repayment_interval(self, x):
 		if x in self.repayment_interval_dict:
 			return self.repayment_interval_dict[x]
@@ -188,24 +186,24 @@ class Cleaning(object):
 			return -2
 
 class Saving(object):
-	def __init__(self, number_file_read =2):
+	def __init__(self, number_file_read=2):
 		clean = Cleaning(number_file_read)
 		self.df = clean.df
 		self.country_code_list = clean.country_code_list
-		self.town_list=clean.town_list
-		self.sector_list=clean.sector_list
-		self.theme_list=clean.theme_list
-		self.geo_level_list=clean.geo_level_list
-		self.activity_list=clean.activity_list
+		self.town_list = clean.town_list
+		self.sector_list = clean.sector_list
+		self.theme_list = clean.theme_list
+		self.geo_level_list = clean.geo_level_list
+		self.activity_list = clean.activity_list
 		self.repayment_interval_list = clean.repayment_interval_list
-		self.status_list=clean.status_list
+		self.status_list = clean.status_list
 		self.number_of_files = number_file_read
 
 	def save_files(self):
 		condition_1 = self.df.status == 1
-		condition_2 = self.df.status ==0
+		condition_2 = self.df.status == 0
 		self.df_new = self.df[condition_1 | condition_2]
-		self.df_new.to_csv("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/%s_two_option.csv" %self.number_of_files)
+		self.df_new.to_csv("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/%s_two_option.csv" %self.number_of_files, index=False)
 		dict_ = {"country_code_list":self.country_code_list, "town_list":self.town_list, "sector_list":self.sector_list, "theme_list": self.theme_list, "geo_level_list":self.geo_level_list,\
 				 "activity_list":self.activity_list, "repayment_interval_list": self.repayment_interval_list, "status_list":self.status_list}
 		for file_name, content in dict_.iteritems():
