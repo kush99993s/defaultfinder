@@ -20,20 +20,20 @@ Average Interest Rate: 36%
 Best model is gradient boosting classifier with recall rate of 0.8. 
 Cost benefit matrix:
 True Positive: 575 
-	Benefit associated with predicting default loan as default
-	Benefit: Loan + Interest
+-Benefit associated with predicting default loan as default
+-Benefit: Loan + Interest
 
 
 False Negative: 607
-	cost associated with predicting default loan as non-default
-	cost: Loan + Interest + churn of lander (Assume 10%)
+-Cost associated with predicting default loan as non-default
+-Cost: Loan + Interest + churn of lander (Assume 10%)
 
 False Positive : 0
-	cost associated with predicting non-default loan as default
-	Since, number of borrower are higher than number of landers. There will not be negative impact classifying some non default loan as default loan
+-cost associated with predicting non-default loan as default
+-Since, number of borrower are higher than number of landers. There will not be negative impact classifying some non default loan as default loan
 
 True Negative: 0
-	Benefit associated with predicting non-default loan as non-default loan
+-Benefit associated with predicting non-default loan as non-default loan
 	benefit will not increase.
 
 Using this cost benefit matrix, I compute profit cure, which shows that there will be maximum profit of $ 3.32 per loan.
