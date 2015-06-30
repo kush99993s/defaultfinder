@@ -14,10 +14,11 @@ You'll need a few things to run the script. This was built using Python 2.7
 * cd predict-kiva && pip install -r requirements.txt
 
 ### Example of assumption of cost benefit matrix:
-1. Average Loan Value: $ 416
-2. Average Interest Rate: 36%
+1. Average Loan Value at KIVA: $ 416
+2. Average Interest Rate for microloans: 36%
 
 3. Best model is gradient boosting classifier with recall rate of 0.8. 
+
 4. Cost benefit matrix:
 
 True Positive: 575 
