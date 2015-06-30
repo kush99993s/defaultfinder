@@ -14,26 +14,26 @@ You'll need a few things to run the script. This was built using Python 2.7
 * cd predict-kiva && pip install -r requirements.txt
 
 ### Example:
-Average Loan Value: $ 416
-Average Interest Rate: 36%
+1. Average Loan Value: $ 416
+2. Average Interest Rate: 36%
 
-Best model is gradient boosting classifier with recall rate of 0.8. 
-Cost benefit matrix:
+3. Best model is gradient boosting classifier with recall rate of 0.8. 
+4. Cost benefit matrix:
 True Positive: 575 
--Benefit associated with predicting default loan as default
--Benefit: Loan + Interest
+- Benefit associated with predicting default loan as default
+- Benefit: Loan + Interest 
 
 
 False Negative: 607
--Cost associated with predicting default loan as non-default
--Cost: Loan + Interest + churn of lander (Assume 10%)
+- Cost associated with predicting default loan as non-default
+- Cost: Loan + Interest + churn of lander (Assume 10%)
 
 False Positive : 0
--cost associated with predicting non-default loan as default
--Since, number of borrower are higher than number of landers. There will not be negative impact classifying some non default loan as default loan
+- Cost associated with predicting non-default loan as default
+- Since, number of borrower are higher than number of landers. There will not be negative impact classifying some non default loan as default loan
 
 True Negative: 0
--Benefit associated with predicting non-default loan as non-default loan
+- Benefit associated with predicting non-default loan as non-default loan
 	benefit will not increase.
 
 Using this cost benefit matrix, I compute profit cure, which shows that there will be maximum profit of $ 3.32 per loan.
