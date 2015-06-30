@@ -3,6 +3,8 @@ import os.path
 from data_cleaning import Saving 
 from sklearn.cross_validation import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+
 class Load_file(object):
 	def __init__(self):
 		self.isfile_ = os.path.isfile("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/1638.csv") 

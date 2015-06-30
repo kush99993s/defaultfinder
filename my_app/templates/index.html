@@ -16,7 +16,13 @@
     
     <title>Find defaulter</title>
     <!-- Bootstrap Core CSS -->
-    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="static/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+        <link href="static/css/bootstrap.min.css" rel="stylesheet">
     <!-- MetisMenu CSS -->
     <link href="static/css/metisMenu.min.css" rel="stylesheet">
     <!-- Timeline CSS -->
@@ -25,12 +31,32 @@
     <link href="static/css/sb-admin-2.css" rel="stylesheet">
     <!-- Morris Charts CSS -->
     <link href="static/css/morris.css" rel="stylesheet">
-    <!-- Custom Fonts -->
-    <link href="static/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>\
+    <style>
+        .legend {
+            line-height: 18px;
+            color: #111;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        .info {
+            padding: 15px 15px;
+            font: 10px/11px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 10px rgba(1,1,1,0.2);
+            border-radius: 10px;
+        }
+        .info h4 {
+            margin: 1 1 10px;
+            color: #777;
+}
+    </style>
 
    
 
@@ -306,9 +332,9 @@
                         </div>
                         <script type="text/javascript">
                             $("select").change(function() {
-                                alert('success');
+                               
                                 var val = $("#cardtype option:checked").val();
-                                alert(val);
+                               
                                 if (val == 'group_by_country') {
                                     try{
                                        $('g').remove()
@@ -319,12 +345,12 @@
 
                                     
                                     function getColor(d) {
-                                        return  d > 0.2     ? '#800026' :
-                                                d > 0.1     ? '#BD0026' :
-                                                d > 0.05    ? '#E31A1C' :
-                                                d > 0.01    ? '#FC4E2A' :
-                                                d > 0.005   ? '#FD8D3C' :
-                                                d > 0.002   ? '#FEB24C' :
+                                        return  d >= 0.2     ? '#800026' :
+                                                d >= 0.1     ? '#BD0026' :
+                                                d >= 0.05    ? '#E31A1C' :
+                                                d >= 0.01    ? '#FC4E2A' :
+                                                d >= 0.005   ? '#FD8D3C' :
+                                                d >= 0.002   ? '#FEB24C' :
                                                 d > 0       ? '#FED976' :
                                                               '#FFFF' ;
                                     }
@@ -339,6 +365,84 @@
                                             fillOpacity: 0.7
                                         };
                                     }
+                                    function highlightFeature(e) {
+                                        var layer = e.target;
+
+                                        layer.setStyle({
+                                            weight: 5,
+                                            color: '#666',
+                                            dashArray: '',
+                                            fillOpacity: 0.7
+                                        });
+
+                                        if (!L.Browser.ie && !L.Browser.opera) {
+                                            layer.bringToFront();
+                                        }
+
+                                        info.update(layer.feature.properties);
+                                    }
+                                    function resetHighlight(e) {
+                                        geojson.resetStyle(e.target);
+                                        info.update();
+                                    }
+                                        
+                                    function zoomToFeature(e) {
+                                        map.fitBounds(e.target.getBounds());
+                                    }
+                                    function onEachFeature(feature, layer) {
+                                        layer.on({
+                                            mouseover: highlightFeature,
+                                            mouseout: resetHighlight,
+                                            click: zoomToFeature
+                                        });
+                                    }
+                                    geojson = L.geoJson(window.countryGeoJSON, {
+                                        style: style,
+                                        onEachFeature: onEachFeature
+                                    }).addTo(map);
+
+                                    legend = L.control({position: 'bottomright'});
+
+                                    var info = L.control();
+
+                                    info.onAdd = function (map) {
+                                        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                                        this.update();
+                                        return this._div;
+                                    };
+
+                                    // method that we will use to update the control based on feature properties passed
+                                    info.update = function (props) {
+
+                                        console.log ( props );
+                                        this._div.innerHTML = '<h4>Normalized Default Rate</h4>' +  (props ?
+                                            '<b>' + props.name + '</b><br />' + props.density.toFixed(4) * 100 
+                                            : 'Hover over a state');
+                                    };
+
+                                    info.addTo(map);
+
+                                    legend.onAdd = function (map) {
+
+                                        var div = L.DomUtil.create('div', 'info legend'),
+                                            grades = [20, 10, 5 ,1 , 0.5, 0.02, 0.005, 0 ],
+                                            labels = [],
+                                            from, to;
+
+                                        for (var i = 0; i < grades.length; i++) {
+                                            from = grades[i];
+                                            to = grades[i + 1];
+
+                                            labels.push(
+                                                '<i style="background:' + getColor(from/100 ) + '"></i> ' +
+                                                from + ('% >='));
+                                        }
+
+                                        div.innerHTML = labels.join('<br><br>');
+                                        return div;
+                                    };
+
+                                    legend.addTo(map);
                                    //  function highlightFeature(e) {
                                    //          var layer = e.target;
 
@@ -370,13 +474,14 @@
                                    //      });
                                    //  }
                                     
-                                    // {onEachFeature: onEachFeature} 
-                                    newLayer = L.geoJson(window.countryGeoJSON, {style: style}).addTo(map);
-                                    newLayer.on('click', onMapClick);
+                                    // {} {onEachFeature: onEachFeature}
+                                    // newLayer = L.geoJson(window.countryGeoJSON, {style: style} ).addTo(map);
+                                    // newLayer.on('click', onMapClick);
                                 
                                 }else if (val == 'group_by_parter_id'){
                                     try{
-                                        map.removeLayer(newLayer);
+                                        map.removeLayer(geojson);
+                                        map.removeControl(legend);
                                     }catch(err){}
 
                                     {% for index in range(0, 376)%}
@@ -384,10 +489,18 @@
                                         {% if normalized_default[index] > 0%}
                                             circle = L.circle([{{lat[index]}}, {{long_[index]}}], 3000000*{{normalized_default[index]}}, {
                                                 color: 'red',
-                                                fillColor: '#f03',
+                                                fillColor: 'NONE',
                                                 fillOpacity: 0.5
                                             }).addTo(map);
                                             circle.bindPopup('{{"parter id: ", parter_id[index], "default rate: ",normalized_default[index] }}');
+                                            
+                                            circle.on('mouseover', function (e) {
+                                                this.openPopup();
+                                            });
+
+                                            circle.on('mouseout', function (e) {
+                                                this.closePopup();
+                                            });
                                         {% endif %}
                                     {% endfor %}
                                 }
@@ -477,7 +590,7 @@
     <script src="static/js/sb-admin-2.js"></script>
     <script>
         window.latlong =[]
-        map = L.map('map').setView([0, 0], 4); // 4 here is magnification level shown in first time
+        map = L.map('map').setView([-100, -100], 4); // 4 here is magnification level shown in first time
 
         L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
             maxZoom: 22 , // how mnay time you can magnify from largest map. After 22 zoom, map is not working due to more magnificaiton

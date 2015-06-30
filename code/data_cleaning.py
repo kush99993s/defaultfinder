@@ -41,10 +41,16 @@ class Cleaning(object):
 		
 
 	def convert_to_data_frame(self, dictionary_):
+		"""
+		Data is stored in JSON, need to transfer into DataFrame for better EDA
+		"""
 		df = pd.DataFrame(dictionary_)
 		return df
 
 	def fill_dictionarys(self):
+		'''
+		Select each features from JSON format to dictinary for easy access 
+		'''
 		for i, j in enumerate(self.df.country_code.unique()):
 			self.country_code_dict[j] = i
 
@@ -70,7 +76,10 @@ class Cleaning(object):
 			self.status_dic[j] = i
 
 	def change_all_variable(self):
-		self.change_gender()
+		'''
+		All features are in text, need to transfer text to numberical to use in model and EDA
+		'''
+		self.change_gender_number()
 		self.change_picture()
 		self.replace_values()
 		self.delete_columns()
@@ -89,6 +98,9 @@ class Cleaning(object):
 		self.df.repayment_term = self.df.repayment_term.fillna(-2)
 
 	def delete_columns(self):
+		'''
+		removing not neccessary columns from data
+		'''
 		del self.df["bulkEntries"]
 		del self.df["tags"]
 		del self.df["bonus_credit_eligibility"]
@@ -97,6 +109,9 @@ class Cleaning(object):
 		del self.df["gender"]
 
 	def text_change(self,x):
+		'''
+		encode text into ascii format 
+		'''
 		try:
 			return x.encode("ascii", "ignore").replace("<i>", " ").replace("</i>", " ").replace("<br>", " ").replace("</br>", " ")
 		except:
@@ -119,7 +134,7 @@ class Cleaning(object):
 	            temp_f +=1
 	    return temp_f
 	
-	def change_gender(self):
+	def change_gender_number(self):
 		self.df["num_male"] = self.df.gender.apply(lambda x: self.find_male(x))
 		self.df["num_female"] = self.df.gender.apply(lambda x: self.find_female(x))
 		self.df["male_ratio"] = self.df.num_male / self.df.num_borrowers
@@ -132,24 +147,35 @@ class Cleaning(object):
 		return number_picture_
 
 	def change_picture(self):
+		'''
+		Finding out how many borrowers are into the picture
+		'''
 		self.df["number_of_picture"] = self.df.has_picture.apply(lambda x: self.number_picture(x))
 		self.df["ratio_of_picture"] = self.df["number_of_picture"]/self.df.num_borrowers
 		del self.df["has_picture"]
    
 	def change_country_code(self, x):
+		'''
+		Changing country code to number
+		'''
 	    if x in self.country_code_dict:
 	        return self.country_code_dict[x]
 	    else:
 	        return -2
 	
 	def change_town(self, x):
+		'''
+		changing town name to number
+		'''
 		if x in self.town_dict:
 			return self.town_dict[x]
 		else:
 			return -2
 	
 	def change_sector(self,x ):
-
+		'''
+		changing categorical sector text to number
+		'''
 	    if x in self.sector_dict:
 	        return self.sector_dict[x]
 	    else:
@@ -186,6 +212,10 @@ class Cleaning(object):
 			return -2
 
 class Saving(object):
+	'''
+	Saving file after preprocess to access easily, saving list to decode cloumns back to value later 
+	when required
+	'''
 	def __init__(self, number_file_read=2):
 		clean = Cleaning(number_file_read)
 		self.df = clean.df
@@ -200,9 +230,13 @@ class Saving(object):
 		self.number_of_files = number_file_read
 
 	def save_files(self):
+		'''
+		Saving loans into file, which are only defaulted or not defaulted
+		'''
 		condition_1 = self.df.status == 1
 		condition_2 = self.df.status == 0
 		self.df_new = self.df[condition_1 | condition_2]
+
 		self.df_new.to_csv("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/%s_two_option.csv" %self.number_of_files, index=False)
 		dict_ = {"country_code_list":self.country_code_list, "town_list":self.town_list, "sector_list":self.sector_list, "theme_list": self.theme_list, "geo_level_list":self.geo_level_list,\
 				 "activity_list":self.activity_list, "repayment_interval_list": self.repayment_interval_list, "status_list":self.status_list}
@@ -211,6 +245,9 @@ class Saving(object):
 				cPickle.dump(content, f) 		
 
 class OpenFile(object):
+	'''
+	open file tool
+	'''
 	def __init__(self):
 		self.isfile_ = os.path.isfile("/home/patanjalichanakya/Documents/Galvanize/find_defaulter/data/1638.csv") 
 
