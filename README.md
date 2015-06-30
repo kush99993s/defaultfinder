@@ -13,7 +13,7 @@ You'll need a few things to run the script. This was built using Python 2.7
 - Checkout the code: 'git clone git://github.com/kush99993s/defaultfinder' 
 * cd predict-kiva && pip install -r requirements.txt
 
-### Example:
+### Example of assumption of cost benefit matrix:
 1. Average Loan Value: $ 416
 2. Average Interest Rate: 36%
 
@@ -35,7 +35,7 @@ False Positive : 0
 
 True Negative: 0
 - Benefit associated with predicting non-default loan as non-default loan
-	benefit will not increase.
+- Benefit will not increase.
 
 Using this cost benefit matrix, I compute profit cure, which shows that there will be maximum profit of $ 3.32 per loan.
 
@@ -43,7 +43,15 @@ Number of Loans are nine hundred thousand. Therefore, total profit is around 3 m
 
 ### How it works:
 
+More than 97% loans are non-default loans. Therefore, It is difficult to use accuracy as matrix to evaluate model. In order to evalute model, we use recall rate (proportion of default loans which are correctly identified as such
 
+All data is in string forment. Therefore, it is required to transform into numbner for modeling.
+
+Using above evalution method, we found that a gradient boosting classifier is best model. 
+
+Once best model is selected, we need to develop cost benefit matrix to translate machine learning model to business aspect. Example of cost benefit matrix & profit curve is show above.
+
+Using cost benefit matrix, develop profit curves. Find maximum possible profit from profit curves. 
 
 
 ##### Caveats:
