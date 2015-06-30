@@ -19,6 +19,7 @@ You'll need a few things to run the script. This was built using Python 2.7
 
 3. Best model is gradient boosting classifier with recall rate of 0.8. 
 4. Cost benefit matrix:
+
 True Positive: 575 
 - Benefit associated with predicting default loan as default
 - Benefit: Loan + Interest 
